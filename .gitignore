@@ -1,0 +1,6 @@
+# development files
+__pycache__/
+EoN.egg-info/
+
+# backup files
+*.bak

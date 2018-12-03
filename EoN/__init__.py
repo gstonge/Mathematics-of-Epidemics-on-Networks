@@ -102,6 +102,8 @@ import EoN.analytic
 from EoN.analytic import *
 import EoN.simulation_investigation
 from EoN.simulation_investigation import *
+import EoN.efficient_SIS
+from EoN.efficient_SIS import *
 
 '''
 These are the systems I still want to include:
