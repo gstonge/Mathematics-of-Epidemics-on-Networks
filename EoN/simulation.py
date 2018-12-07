@@ -2295,16 +2295,16 @@ def _process_trans_SIS_nonMarkov_(time, G, source, target, future_transmissions,
         if rec_time[target]<Q.tmax:
             Q.add(rec_time[target], _process_rec_SIS_, 
                     args = (target, times, recovery_times, S, I, status))
-        for v in G.neighbors(target): #target plays role of source here
-            if trans_delays[v]:
-                trans_times = [time + td for td in trans_delays[v]] #when do transmissions happen
-                if status[v] == 'I':  #only care about those after current infectious period
-                    trans_times = [time for time in trans_times if time>rec_time[v]]
-                following_transmissions = trans_times[1:]
-                if trans_times: #no point adding any if there are none
-                    Q.add(trans_times[0], _process_trans_SIS_nonMarkov_, args = (G, target, v, following_transmissions, times, S, I, Q, status, 
-                                                                                    rec_time, infection_times, recovery_times, transmissions,
-                                                                                    trans_and_rec_time_fxn, trans_and_rec_time_args))
+
+        for v in trans_delays.keys(): #target plays role of source here
+            trans_times = [time + td for td in trans_delays[v]] #when do transmissions happen
+            if status[v] == 'I':  #only care about those after current infectious period
+                trans_times = [time for time in trans_times if time>rec_time[v]]
+            following_transmissions = trans_times[1:]
+            if trans_times: #no point adding any if there are none
+                Q.add(trans_times[0], _process_trans_SIS_nonMarkov_, args = (G, target, v, following_transmissions, times, S, I, Q, status, 
+                                                                                rec_time, infection_times, recovery_times, transmissions,
+                                                                                trans_and_rec_time_fxn, trans_and_rec_time_args))
     
     #target is definitely infected now.  It has some future_transmissions stored.  
     #do they happen?

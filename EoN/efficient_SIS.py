@@ -49,18 +49,16 @@ class NeighborSampler:
         return self.neighbor_label_list_dict[node][index]
 
 
-def _get_efficient_trans_and_rec_fxn_SIS_(G, status, rec_time, time,
-                                          cumulative_trans_fxn,
+def get_efficient_trans_and_rec_fxn_SIS(G, cumulative_trans_fxn,
                                           inverse_cumulative_trans_fxn,
                                           inverse_cumulative_rec_fxn):
     """Returns efficient methods to determine the transmission to neighbors
     and arguments to be used along with fast_nonMarkov_SIS.
     """
 
-    args = tuple([NeighborSampler(G), status, rec_time, time])
+    args = tuple([NeighborSampler(G)])
 
-    def trans_and_rec(node, susceptible_neighbors, neighbor_sampler, status,
-                     rec_time, time):
+    def trans_and_rec(node, susceptible_neighbors, neighbor_sampler):
         #first get recuperation delay
         rec_delay = inverse_cumulative_rec_fxn(-np.log(random()))
         cumulative_infection = cumulative_trans_fxn(rec_delay)
@@ -71,18 +69,14 @@ def _get_efficient_trans_and_rec_fxn_SIS_(G, status, rec_time, time,
         trans_delay_dict = dict()
         for i in range(transmission_attempts):
             neighbor = neighbor_sampler.get_random_neighbor(node)
-            #verify first if transmission is plausible
-            if not (status[neighbor] == 'I' and
-                    rec_time[neighbor] > time + rec_delay):
-                trans_delay = inverse_cumulative_trans_fxn(
-                    random()*cumulative_infection)
-                if neighbor in trans_delay_dict:
-                    trans_delay_dict[neighbor].append(trans_delay)
-                else:
-                    trans_delay_dict[neighbor] = [trans_delay]
-                #Note : a second verification if the transmission is plausible
-                #for this trans_delay is performed in the main code
-                #in the function _process_trans_SIS_nonMarkov_
+            #Using another framework, we could skip this step if the neighbor
+            #is infected and recover later that time + rec_delay
+            trans_delay = inverse_cumulative_trans_fxn(
+                random()*cumulative_infection)
+            if neighbor in trans_delay_dict:
+                trans_delay_dict[neighbor].append(trans_delay)
+            else:
+                trans_delay_dict[neighbor] = [trans_delay]
         return trans_delay_dict, rec_delay
 
     return trans_and_rec, args
