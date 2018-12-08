@@ -77,6 +77,9 @@ def get_efficient_trans_and_rec_fxn_SIS(G, cumulative_trans_fxn,
                 trans_delay_dict[neighbor].append(trans_delay)
             else:
                 trans_delay_dict[neighbor] = [trans_delay]
+        #delay must be sorted
+        for neighbor in trans_delay_dict.keys():
+            trans_delay_dict[neighbor].sort()
         return trans_delay_dict, rec_delay
 
     return trans_and_rec, args
